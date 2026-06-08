@@ -1,0 +1,71 @@
+body #gaia_header {
+  font-size: 11px;
+  font-family: Verdana, Helvetica, Arial, sans-serif;
+}
+
+#header {
+  width: 100%;
+  height: 170px;
+  font-size: 10px;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+#gaia_header {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 25px;
+  background: #000;
+  z-index: 99999;
+  margin: 0;
+  padding: 0;
+}
+
+#gaia_header #header_left {
+  background: #000;
+  color: #fff;
+  float: left;
+  width: 49%;
+  height: 25px;
+  line-height: 24px;
+}
+
+#gaia_header #header_left img {
+  top: 0;
+  vertical-align: middle;
+}
+
+#gaia_header #header_right {
+  background: #000;
+  height: 25px;
+  color: #fff;
+  float: left;
+  width: 49%;
+  z-index: 9999;
+  text-align: right;
+  line-height: 24px;
+}
+
+#gaia_header #header_right img {
+  top: 0;
+  vertical-align: middle;
+}
+
+#header_right li img {
+  padding-right: 4px;
+}
+
+#gaia_header ul li {
+  display: inline;
+}
+
+#gaia_header a {
+  color: #ccc !important;
+}
+
+.spacer {
+  padding-left: 10px;
+}

@@ -1,0 +1,37 @@
+#columns {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 8px;
+    width: 700px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#column_1,
+#column_2,
+#column_3 {
+    overflow: hidden;
+    border: 1px dotted #64748b;
+    box-sizing: border-box;
+    width: 100%;
+
+}
+
+#column_1, #column_2 { margin-left: 0px; }
+
+#column_1 {
+    grid-row: span 2;
+    height: 408px;
+}
+
+#column_2,
+#column_3 {
+    height: 200px;
+}
+
+
+.clear {
+    display: none;
+}
