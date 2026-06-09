@@ -12,6 +12,7 @@ import "./app.css"
 import { ThemeProvider } from 'next-themes'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MainLayout } from '@/layouts/MainLayout'
+import { Toaster } from "@/components/ui/sonner"
 import "./themes/index.css"
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -33,6 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <TooltipProvider>
             <MainLayout>{children}</MainLayout>
           </TooltipProvider>
+          <Toaster position="top-center"/>
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />

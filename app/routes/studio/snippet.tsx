@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, memo } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { Plus, ChevronRight, Check, MoreHorizontal, HelpCircle } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "~/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
@@ -48,25 +49,33 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
     const safeCode = await sanitizeCss(newSnippetCode, true)
     setSnippets(prev => [...prev, { id: Date.now(), name: newSnippetName, code: safeCode }])
     setNewSnippetName(""); setNewSnippetCode(""); setAddFormOpen(false)
+    toast.success("Snippet created")
   }, [newSnippetName, newSnippetCode])
 
   const updateSnippet = useCallback(async (id: number) => {
     const safeCode = await sanitizeCss(editCode, true)
     setSnippets(prev => prev.map(s => s.id === id ? { ...s, name: editName, code: safeCode } : s))
     setEditingId(null)
+    toast.success("Snippet updated")
   }, [editName, editCode])
 
   const deleteSnippet = useCallback((id: number) => {
     setSnippets(prev => prev.filter(s => s.id !== id))
+    toast.success("Snippet deleted")
   }, [])
 
-  const handleInsert = useCallback(async (action: 'append' | 'prepend' | 'replace' | 'cursor', snippetCode: string) => {
+  const handleInsert = useCallback(async (action: 'append' | 'prepend' | 'replace' | 'cursor', snippet: Snippet) => {
     const view = editorRef.current
-    const safeSnippet = await sanitizeCss(snippetCode, true)
-    if (action === 'cursor' && view) { view.dispatch(view.state.replaceSelection(safeSnippet)); view.focus() }
+    const safeSnippet = await sanitizeCss(snippet.code, true)
+    if (action === 'cursor' && view) { 
+      view.dispatch(view.state.replaceSelection(safeSnippet)); 
+      view.focus() 
+    }
     else if (action === 'append') setCode(`${code}\n${safeSnippet}`)
     else if (action === 'prepend') setCode(`${safeSnippet}\n${code}`)
     else if (action === 'replace') setCode(safeSnippet)
+    
+    toast.success(`Inserted ${snippet.name}`)
   }, [editorRef, setCode, code])
 
   return (
@@ -77,7 +86,7 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
           animate={{ width: 300, opacity: 1 }} 
           exit={{ width: 0, opacity: 0 }} 
           transition={{ type: "spring", bounce: 0, duration: 0.3 }} 
-          className="bg-muted/20 flex flex-col w-75 h-full overflow-hidden border-r border-border"
+          className="bg-muted/20 flex flex-col h-full overflow-hidden border-r border-border"
         >
           <div className="h-12 px-4 border-b border-border flex items-center justify-between shrink-0">
             <Button variant="ghost" size="sm" className="h-8 gap-1 px-1" onClick={() => setSnippetsOpen(false)}>
@@ -96,7 +105,7 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
               </Button>
             </div>
           </div>
-          <ScrollArea className="flex-1 w-full">
+          <div className="flex-1 overflow-y-auto">
             <div className="p-2 flex flex-col gap-2">
               <AnimatePresence mode="popLayout">
                 {addFormOpen && (
@@ -118,28 +127,34 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
               {snippets.map((s) => (
                 <motion.div 
                   key={s.id} 
-                  layout 
-                  initial={{ opacity: 0, scale: 0.95 }} 
-                  animate={{ opacity: 1, scale: 1 }} 
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  layout="position"
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }}
+                  className="w-full"
                 >
                   <div className="group p-2 rounded-lg hover:bg-secondary border border-transparent hover:border-border transition-colors">
                     {editingId === s.id ? (
-                      <div className="flex flex-col gap-2 p-2">
+                      <div className="flex flex-col gap-2 p-2" onClick={(e) => e.stopPropagation()}>
                         <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-8 text-xs" />
                         <Textarea value={editCode} onChange={(e) => setEditCode(e.target.value)} className="h-32 w-full resize-none text-xs p-2" />
                         <Button size="sm" onClick={() => updateSnippet(s.id)} className="w-full h-8 text-xs"><Check className="size-3 mr-2" /> Save</Button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between cursor-pointer" onClick={() => handleInsert('cursor', s.code)}>
-                        <div className="flex flex-col truncate w-48"><span className="text-xs font-semibold">{s.name}</span><span className="text-[10px] text-muted-foreground font-mono truncate">{s.code.split('\n')[0]}</span></div>
+                      <div className="flex items-center justify-between cursor-pointer" onClick={() => handleInsert('cursor', s)}>
+                        <div className="flex flex-col truncate w-full pr-2">
+                          <span className="text-xs font-semibold">{s.name}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono truncate">{s.code.split('\n')[0]}</span>
+                        </div>
                         <div onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
-                            <DropdownMenuTrigger><Button variant="ghost" size="icon" className="size-6"><MoreHorizontal className="size-4" /></Button></DropdownMenuTrigger>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-6 shrink-0"><MoreHorizontal className="size-4" /></Button>
+                            </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
-                              <DropdownMenuItem onClick={() => handleInsert('replace', s.code)}>Replace</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleInsert('prepend', s.code)}>Prepend</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleInsert('append', s.code)}>Append</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleInsert('replace', s)}>Replace</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleInsert('prepend', s)}>Prepend</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleInsert('append', s)}>Append</DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => { setEditingId(s.id); setEditName(s.name); setEditCode(s.code); }}>Edit</DropdownMenuItem>
                               <DropdownMenuItem className="text-destructive" onClick={() => deleteSnippet(s.id)}>Delete</DropdownMenuItem>
@@ -152,7 +167,7 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
                 </motion.div>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

@@ -54,23 +54,27 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const updateElementStyle = useCallback((selector: string, property: string, value: string) => {
-    setCssCode(prev => {
-      const selectorRegex = new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*{([^}]*)}`, 'g');
-      let found = false;
-      const updatedCss = prev.replace(selectorRegex, (match, body) => {
-        found = true;
-        const propRegex = new RegExp(`${property}:\\s*[^;!]+(!important)?`, 'g');
-        const newProp = `${property}: ${value} !important`;
-        if (propRegex.test(body)) {
-          return match.replace(propRegex, newProp);
-        }
-        return match.replace('{', `{ ${newProp};`);
-      });
-
-      return found ? updatedCss : `${prev}\n${selector} { ${property}: ${value} !important; }`;
+const updateElementStyle = useCallback((selector: string, property: string, value: string) => {
+  setCssCode(prev => {
+    // Escape special characters for Regex, but keep the comma/space for 'html, body'
+    // We only need to escape characters that interfere with Regex structure
+    const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const selectorRegex = new RegExp(`${escapedSelector}\\s*{([^}]*)}`, 'g');
+    
+    let found = false;
+    const updatedCss = prev.replace(selectorRegex, (match, body) => {
+      found = true;
+      const propRegex = new RegExp(`${property}:\\s*[^;!]+(!important)?`, 'g');
+      const newProp = `${property}: ${value} !important`;
+      if (propRegex.test(body)) {
+        return match.replace(propRegex, newProp);
+      }
+      return match.replace('{', `{ ${newProp};`);
     });
-  }, []);
+
+    return found ? updatedCss : `${prev}\n${selector} { ${property}: ${value} !important; }`;
+  });
+}, []);
 
   const insertCode = useCallback((text: string) => {
     setIsCodeOpen(true)

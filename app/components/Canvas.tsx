@@ -58,29 +58,34 @@ export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
         });
 
         document.addEventListener('click', (e) => {
-          if (!window.parent.isSelectionModeActive) return;
-          e.preventDefault();
-          e.stopPropagation();
-          const target = e.target;
-          if (lastSelected) lastSelected.classList.remove('highlight-selected');
-          target.classList.add('highlight-selected');
-          lastSelected = target;
+  if (!window.parent.isSelectionModeActive) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const target = e.target;
+  if (lastSelected) lastSelected.classList.remove('highlight-selected');
+  target.classList.add('highlight-selected');
+  lastSelected = target;
 
-          const path = [];
-          let el = target;
-          while (el && el !== document.body && el.id !== 'base-layer') {
-            let selector = '';
-            if (el.id) {
-              selector = '#' + el.id;
-            } else if (el.className && typeof el.className === 'string') {
-               const classes = el.className.split(' ').filter(c => !c.includes('highlight'));
-               if (classes.length > 0) selector = '.' + classes.join('.');
-            }
-            if (selector) path.unshift(selector);
-            el = el.parentElement;
-          }
-          window.parent.postMessage({ type: 'element-selected', selector: path.length > 0 ? path.join(' > ') : 'body' }, '*');
-        });
+  const path = [];
+  let el = target;
+  while (el && el !== document.body && el.id !== 'base-layer') {
+    let selector = '';
+    if (el.id) {
+      selector = '#' + el.id;
+    } else if (el.className && typeof el.className === 'string') {
+      const classes = el.className.split(' ').filter(c => !c.includes('highlight'));
+      if (classes.length > 0) selector = '.' + classes.join('.');
+    }
+    if (selector) path.unshift(selector);
+    el = el.parentElement;
+  }
+  
+  // Format the selector: remove '>', and handle 'body'
+  let selectorString = path.length > 0 ? path.join(' ') : 'body';
+  if (selectorString === 'body') selectorString = 'html, body';
+  
+  window.parent.postMessage({ type: 'element-selected', selector: selectorString }, '*');
+});
       </script>
     </body>
   </html>
