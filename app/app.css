@@ -134,7 +134,7 @@
 }
 
 .custom-layout .react-colorful {
-  padding: 5px 10px;
+  padding: 0px 0px;
   padding-top: 0px;
   border-radius: var(--radius);
   background: var(--background);
@@ -144,7 +144,7 @@
 }
 
 .custom-layout .react-colorful__saturation {
-  margin: 15px 0;
+  margin: 0px 0;
   border-radius: 8px;
   border-bottom: none;
 
@@ -165,10 +165,4 @@
   height: 10px;
   border-radius: 50%;
   border: 1px solid white;
-}
-
-.cm-snippet-highlight {
-  background-color: rgba(16, 185, 129, 0.2) !important;
-  border-bottom: 2px solid rgba(16, 185, 129, 0.5) !important;
-  transition: background-color 0.5s ease;
 }

@@ -18,12 +18,12 @@ export const PopoverPicker = ({ color, onChange }: PopoverPickerProps) => {
         />
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 border-none bg-transparent shadow-none" align="start">
-        <div className="custom-layout p-4 rounded-xl backdrop-blur-md bg-[#33333a]/80 border border-white/10 flex flex-col gap-3">
+        <div className="custom-layout p-0 rounded-xl backdrop-blur-md bg-background border flex flex-col">
           <HexColorPicker color={color} onChange={onChange} />
           
           <input
             type="text"
-            className="w-full px-3 py-1.5 rounded bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full px-3 py-1.5 rounded bg-muted text-foreground text-xs font-mono focus:outline-none "
             value={color}
             onChange={(e) => onChange(e.target.value)}
             placeholder="#ffffff, rgba(0,0,0,1)"
