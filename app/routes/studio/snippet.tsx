@@ -79,35 +79,57 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
   }, [editName, editCode, putItem, upsertSnippet])
 
   const handleDelete = useCallback(async (id: number) => {
+    const previousCode = code
     await deleteItem(id)
     deleteSnippet(id)
-    toast.success("Snippet deleted")
-  }, [deleteItem, deleteSnippet])
+    toast("Snippet deleted", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          setCode(previousCode)
+          toast.info("Action undone")
+        },
+      },
+    })
+  }, [deleteItem, deleteSnippet, code, setCode])
 
   const handleInsert = useCallback(async (action: 'append' | 'prepend' | 'replace' | 'cursor', snippet: SnippetType) => {
     const view = editorRef.current
     const safeSnippet = await sanitizeCss(snippet.code, true)
-    if (action === 'cursor' && view) { view.dispatch(view.state.replaceSelection(safeSnippet)); view.focus() }
+    const previousCode = code
+
+    if (action === 'cursor' && view) {
+      view.dispatch(view.state.replaceSelection(safeSnippet));
+      view.focus()
+    }
     else if (action === 'append') setCode(`${code}\n${safeSnippet}`)
     else if (action === 'prepend') setCode(`${safeSnippet}\n${code}`)
     else if (action === 'replace') setCode(safeSnippet)
-    
-    toast.success(`Inserted ${snippet.name}`)
+
+    toast(`Inserted ${snippet.name}`, {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          setCode(previousCode)
+          toast.info("Action undone")
+        },
+      },
+    })
   }, [editorRef, setCode, code])
 
   return (
     <AnimatePresence mode="wait">
       {snippetsOpen && (
-        <motion.div 
-          initial={{ width: 0, opacity: 0 }} 
-          animate={{ width: 300, opacity: 1 }} 
-          exit={{ width: 0, opacity: 0 }} 
-          transition={{ type: "spring", bounce: 0, duration: 0.3 }} 
+        <motion.div
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: 300, opacity: 1 }}
+          exit={{ width: 0, opacity: 0 }}
+          transition={{ type: "spring", bounce: 0, duration: 0.3 }}
           className="flex flex-col h-full overflow-hidden border-r border-border"
         >
           <div className="h-12 px-4 border-b border-border flex items-center justify-between shrink-0">
             <Button variant="ghost" size="sm" className="h-8 gap-1 px-1" onClick={() => setSnippetsOpen(false)}>
-              <ChevronRight className="size-3 rotate-180" /> 
+              <ChevronRight className="size-3 rotate-180" />
               <span className="text-xs font-semibold">Snippets</span>
             </Button>
             <div className="flex items-center gap-1">
@@ -126,10 +148,10 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
 
           <AnimatePresence initial={false}>
             {addFormOpen && (
-              <motion.div 
-                initial={{ height: 0, opacity: 0 }} 
-                animate={{ height: "auto", opacity: 1 }} 
-                exit={{ height: 0, opacity: 0 }} 
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden border-b border-border shrink-0"
               >
                 <div className="p-3 bg-background/50 flex flex-col gap-2">
@@ -147,8 +169,20 @@ export const Snippet = memo(function Snippet({ editorRef, code, setCode, snippet
                 <motion.div layout className="flex flex-col gap-2">
                   {showDefaults && defaultSnippets.map((s) => (
                     <motion.div key={s.id} layout="position" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                      <div className="group p-2 rounded-lg hover:bg-secondary border border-transparent hover:border-border cursor-pointer" onClick={() => handleInsert('cursor', s)}>
-                        <span className="text-xs font-semibold">{s.name}</span>
+                      <div className="group p-2 rounded-lg hover:bg-secondary border border-transparent hover:border-border">
+                        <div className="flex items-center justify-between cursor-pointer" onClick={() => handleInsert('cursor', s)}>
+                          <div className="flex flex-col truncate w-48"><span className="text-xs font-semibold">{s.name}</span><span className="text-[10px] text-muted-foreground font-mono truncate">{s.code.split('\n')[0]}</span></div>
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger><Button variant="ghost" size="icon" className="size-6"><MoreHorizontal className="size-4" /></Button></DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleInsert('replace', s)}>Replace</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleInsert('prepend', s)}>Prepend</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleInsert('append', s)}>Append</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
