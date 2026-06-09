@@ -132,3 +132,37 @@
     @apply font-sans;
     }
 }
+
+.custom-layout .react-colorful {
+  padding: 5px 10px;
+  padding-top: 0px;
+  border-radius: var(--radius);
+  background: var(--background);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+    height: 10rem;
+}
+
+.custom-layout .react-colorful__saturation {
+  margin: 15px 0;
+  border-radius: 8px;
+  border-bottom: none;
+
+}
+
+.custom-layout .react-colorful__hue,
+.custom-layout .react-colorful__alpha {
+  order: 1;
+  height: 5px;
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+
+.custom-layout .react-colorful__hue-pointer,
+.custom-layout .react-colorful__alpha-pointer,
+ .custom-layout .react-colorful__saturation-pointer{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid white;
+}

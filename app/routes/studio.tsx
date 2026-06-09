@@ -55,6 +55,13 @@ function StudioLayout() {
           </header>
         )}
         <div className={cn("flex-1 w-full h-full relative overflow-hidden flex items-center justify-center", !isMaximized && "p-8")}>
+<div 
+  className="absolute inset-0 z-0 opacity-10 mask-[linear-gradient(to_bottom,white,transparent)]" 
+  style={{ 
+    backgroundImage: `linear-gradient(#9C92AC 1px, transparent 1px), linear-gradient(90deg, #9C92AC 1px, transparent 1px)`,
+    backgroundSize: "20px 20px"
+  }}
+></div>
           <FloatingControls isMaximized={isMaximized} setIsMaximized={setIsMaximized} />
           <Canvas isMaximized={isMaximized} />
         </div>
@@ -100,12 +107,10 @@ export default function Studio() {
   const { isMobile, isLoading: isMobileLoading } = useIsMobile()
   const { isTablet, isLoading: isTabletLoading } = useIsTablet()
 
-  // Wait until both hooks have finished their initial calculations
   if (isMobileLoading || isTabletLoading) {
     return null
   }
 
-  // Now you can safely check the boolean values
   if (isMobile || isTablet) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center p-4 text-center bg-background">

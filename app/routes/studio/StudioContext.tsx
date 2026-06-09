@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useCallback, useRef } from "react"
+import React, { createContext, useContext, useState, useMemo, useCallback, useRef, useEffect } from "react"
 import { EditorView } from "@uiw/react-codemirror"
 
 type StudioContextType = {
@@ -9,6 +9,13 @@ type StudioContextType = {
   loadPreset: (id: string, category: string) => Promise<void>
   editorViewRef: React.MutableRefObject<EditorView | null>
   insertCode: (text: string) => void
+  selectedElement: string | null
+  setSelectedElement: (selector: string | null) => void
+  isSelectionMode: boolean
+  setIsSelectionMode: (mode: boolean) => void
+  targetProperty: string
+  setTargetProperty: (prop: string) => void
+  updateElementStyle: (selector: string, property: string, value: string) => void
 }
 
 type CssCodeContextType = {
@@ -23,42 +30,72 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState<"v1" | "v2">("v2")
   const [cssCode, setCssCode] = useState("")
   const [isCodeOpen, setIsCodeOpen] = useState(false)
-  const abortControllerRef = useRef<AbortController | null>(null)
+  const [selectedElement, setSelectedElement] = useState<string | null>(null)
+  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [targetProperty, setTargetProperty] = useState("background-color")
   const editorViewRef = useRef<EditorView | null>(null)
 
-const loadPreset = useCallback(async (id: string, category: string) => {
-  try {
-    // Vite's dynamic import with the correct path
-    // We use a template string to dynamically point to the new location in app/presets
-    const module = await import(`../../presets/${category}/${id}/preset.css?raw`);
-    setCssCode(module.default);
-  } catch (err) {
-    console.error("Failed to load preset CSS:", err);
-  }
-}, []);
-
-const insertCode = useCallback((text: string) => {
-  setIsCodeOpen(true)
-  
-  setTimeout(() => {
-    if (editorViewRef.current) {
-      const view = editorViewRef.current
-      const doc = view.state.doc
-      const lastLine = doc.line(doc.lines)
-      
-      const needsNewline = lastLine.text.trim().length > 0
-      const codeToInsert = `${needsNewline ? "\n" : ""}${text} {}\n`
-      
-      view.dispatch({
-        changes: { from: doc.length, insert: codeToInsert },
-        selection: { anchor: doc.length + codeToInsert.length }
-      })
-      view.focus()
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "element-selected") {
+        setSelectedElement(event.data.selector)
+      }
     }
-  }, 150)
-}, [setIsCodeOpen])
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
 
-  const studioValue = useMemo(() => ({ version, setVersion, isCodeOpen, setIsCodeOpen, loadPreset, editorViewRef, insertCode }), [version, isCodeOpen, loadPreset, insertCode])
+  const loadPreset = useCallback(async (id: string, category: string) => {
+    try {
+      const module = await import(`../../presets/${category}/${id}/preset.css?raw`);
+      setCssCode(module.default);
+    } catch (err) {
+      console.error("Failed to load preset CSS:", err);
+    }
+  }, []);
+
+  const updateElementStyle = useCallback((selector: string, property: string, value: string) => {
+    setCssCode(prev => {
+      const selectorRegex = new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*{([^}]*)}`, 'g');
+      let found = false;
+      const updatedCss = prev.replace(selectorRegex, (match, body) => {
+        found = true;
+        const propRegex = new RegExp(`${property}:\\s*[^;!]+(!important)?`, 'g');
+        const newProp = `${property}: ${value} !important`;
+        if (propRegex.test(body)) {
+          return match.replace(propRegex, newProp);
+        }
+        return match.replace('{', `{ ${newProp};`);
+      });
+
+      return found ? updatedCss : `${prev}\n${selector} { ${property}: ${value} !important; }`;
+    });
+  }, []);
+
+  const insertCode = useCallback((text: string) => {
+    setIsCodeOpen(true)
+    setTimeout(() => {
+      if (editorViewRef.current) {
+        const view = editorViewRef.current
+        const doc = view.state.doc
+        const lastLine = doc.line(doc.lines)
+        const needsNewline = lastLine.text.trim().length > 0
+        const codeToInsert = `${needsNewline ? "\n" : ""}${text} {}\n`
+        view.dispatch({
+          changes: { from: doc.length, insert: codeToInsert },
+          selection: { anchor: doc.length + codeToInsert.length }
+        })
+        view.focus()
+      }
+    }, 150)
+  }, [setIsCodeOpen])
+
+  const studioValue = useMemo(() => ({ 
+    version, setVersion, isCodeOpen, setIsCodeOpen, loadPreset, 
+    editorViewRef, insertCode, selectedElement, setSelectedElement,
+    isSelectionMode, setIsSelectionMode, targetProperty, setTargetProperty, updateElementStyle
+  }), [version, isCodeOpen, loadPreset, insertCode, selectedElement, isSelectionMode, targetProperty, updateElementStyle])
+  
   const cssValue = useMemo(() => ({ cssCode, setCssCode }), [cssCode])
 
   return (
