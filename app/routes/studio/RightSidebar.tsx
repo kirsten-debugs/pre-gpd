@@ -40,11 +40,7 @@ const MENU_ITEMS = [
   { id: RIGHT_MENU_KEYS.SETTINGS, icon: Settings, label: "Settings" },
 ]
 
-interface RightSidebarProps {
-  isMaximized: boolean
-}
-
-export const RightSidebar = memo(function RightSidebar({ isMaximized }: RightSidebarProps) {
+export const RightSidebar = memo(function RightSidebar() {
   const [rightOpen, setRightOpen] = useState(true)
   const [activeRight, setActiveRight] = useState<RightMenuKey>(RIGHT_MENU_KEYS.FILE)
   
@@ -86,14 +82,8 @@ export const RightSidebar = memo(function RightSidebar({ isMaximized }: RightSid
     <>
       <motion.aside
         initial={false}
-        animate={{ 
-          width: rightOpen ? 256 : 0,
-          position: isMaximized ? "fixed" : "relative",
-          right: isMaximized ? 48 : 0,
-          top: 0,
-          height: "100vh"
-        }}
-        className="border-l border-border overflow-hidden z-30 bg-background/50 backdrop-blur-md shadow-xl"
+        animate={{ width: rightOpen ? 256 : 0 }}
+        className="shrink-0 border-l border-border overflow-hidden z-20 bg-background/50 backdrop-blur-sm"
       >
         <div className="w-64 flex flex-col h-screen">
           <div className="h-14 shrink-0 flex items-center px-4 border-b border-border">
@@ -158,7 +148,9 @@ export const RightSidebar = memo(function RightSidebar({ isMaximized }: RightSid
                     <Box className="size-3" /> Border Radius
                   </h3>
                   <div className="relative flex items-center">
-                    <div {...bindRadius()} className="absolute left-2 z-10 text-[10px] text-muted-foreground font-bold uppercase cursor-ew-resize hover:text-foreground select-none touch-none">r</div>
+                    <div {...bindRadius()} className="absolute left-2 z-10 text-[10px] text-muted-foreground font-bold uppercase cursor-ew-resize hover:text-foreground select-none touch-none">
+                      r
+                    </div>
                     <Input 
                       type="number" 
                       value={borderRadius} 
@@ -178,7 +170,7 @@ export const RightSidebar = memo(function RightSidebar({ isMaximized }: RightSid
         </div>
       </motion.aside>
 
-      <aside className={`shrink-0 w-12 flex flex-col items-center py-4 gap-4 border-l border-border z-30 bg-background/50 backdrop-blur-md ${isMaximized ? "fixed right-0 top-0 h-full" : ""}`}>
+      <aside className="shrink-0 w-12 flex flex-col items-center py-4 gap-4 border-l border-border z-20 bg-background/50 backdrop-blur-sm">
         <Tooltip>
           <TooltipTrigger>
             <Button variant="ghost" size="icon" className="size-8 rounded-md" onClick={toggleSidebar} aria-label="Toggle Sidebar">
