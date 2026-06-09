@@ -1,5 +1,9 @@
-import { HexColorPicker } from "react-colorful"
+import { colord, extend } from "colord"
+import namesPlugin from "colord/plugins/names"
+import { HexAlphaColorPicker } from "react-colorful"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
+
+extend([namesPlugin])
 
 interface PopoverPickerProps {
   color: string
@@ -7,6 +11,8 @@ interface PopoverPickerProps {
 }
 
 export const PopoverPicker = ({ color, onChange }: PopoverPickerProps) => {
+  const hexAlpha = colord(color).toHex()
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -19,14 +25,14 @@ export const PopoverPicker = ({ color, onChange }: PopoverPickerProps) => {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 border-none bg-transparent shadow-none" align="start">
         <div className="custom-layout p-0 rounded-xl backdrop-blur-md bg-background border flex flex-col">
-          <HexColorPicker color={color} onChange={onChange} />
+          <HexAlphaColorPicker color={hexAlpha} onChange={onChange} />
           
           <input
             type="text"
-            className="w-full px-3 py-1.5 rounded bg-muted text-foreground text-xs font-mono focus:outline-none "
-            value={color}
+            className="w-full px-3 py-1.5 rounded bg-muted text-foreground text-xs font-mono focus:outline-none"
+            value={hexAlpha}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="#ffffff, rgba(0,0,0,1)"
+            placeholder="hex"
           />
         </div>
       </PopoverContent>

@@ -5,9 +5,11 @@ import gaiaCss from "@/presets/gaia.css?raw"
 import gaiaV1Html from "@/presets/gaia.v1.html?raw"
 import gaiaV1Css from "@/presets/gaia.v1.css?raw"
 import { useStudio, useCssCode } from "@/routes/studio/StudioContext"
+import { useProfileStore } from "@/store/useProfileStore"
 
 const TARGET_WIDTH = 1920
 const TARGET_HEIGHT = 1080
+const DEFAULT_AVATAR = "https://a1cdn.gaiaonline.com/dress-up/avatar/ava/0e/6e/6255ead32c36e0e_flip.png"
 
 interface CanvasProps {
   isMaximized: boolean
@@ -16,11 +18,14 @@ interface CanvasProps {
 export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
   const { version, isSelectionMode } = useStudio()
   const { cssCode } = useCssCode()
+  const { avatarUrl } = useProfileStore()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   const htmlSource = useMemo(() => (version === "v1" ? gaiaV1Html : gaiaHtml), [version])
   const baseCss = useMemo(() => (version === "v1" ? gaiaV1Css : gaiaCss), [version])
+
+  const finalAvatarUrl = avatarUrl || DEFAULT_AVATAR
 
   const srcDoc = useMemo(() => `
   <!DOCTYPE html>
@@ -29,9 +34,12 @@ export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
       <meta charset="utf-8" />
       <style id="base-styles">${baseCss}</style>
       <style id="user-overrides"></style>
+      <style id="avatar-styles"></style>
       <style>
         .highlight-hover { outline: 2px solid #94a3b8 !important; cursor: crosshair !important; }
         .highlight-selected { outline: 2px solid #3b82f6 !important; }
+        #id_details img { opacity: 0; transition: opacity 0.15s ease-in; }
+        .avatar-ready { opacity: 1 !important; }
       </style>
     </head>
     <body>
@@ -39,12 +47,34 @@ export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
       <script>
         ${rawGaiaScript}
         const userStyleTag = document.getElementById('user-overrides');
+        const avatarStyleTag = document.getElementById('avatar-styles');
         let lastSelected = null;
         let lastHovered = null;
 
         window.addEventListener('message', (e) => {
-          if (e.data.type === 'update-css' && userStyleTag) userStyleTag.textContent = e.data.css;
+          if (e.data.type === 'update-css' && userStyleTag) {
+            userStyleTag.textContent = e.data.css;
+          }
+          if (e.data.type === 'update-avatar') {
+            const detailsPanel = document.getElementById('id_details');
+            if (detailsPanel && e.data.avatarUrl) {
+              const avatarImg = detailsPanel.querySelector('img');
+              if (avatarImg) {
+                const loader = new Image();
+                loader.onload = () => {
+                  avatarImg.src = e.data.avatarUrl;
+                  avatarImg.classList.add('avatar-ready');
+                };
+                loader.src = e.data.avatarUrl;
+              }
+            }
+            if (avatarStyleTag && e.data.avatarUrl) {
+              avatarStyleTag.textContent = ':root { --user-avatar-url: url("' + e.data.avatarUrl + '"); } [data-avatar] { content: var(--user-avatar-url) !important; }';
+            }
+          }
         });
+
+        window.parent.postMessage({ type: 'iframe-ready' }, '*');
 
         document.addEventListener('mouseover', (e) => {
           if (!window.parent.isSelectionModeActive) return;
@@ -58,34 +88,33 @@ export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
         });
 
         document.addEventListener('click', (e) => {
-  if (!window.parent.isSelectionModeActive) return;
-  e.preventDefault();
-  e.stopPropagation();
-  const target = e.target;
-  if (lastSelected) lastSelected.classList.remove('highlight-selected');
-  target.classList.add('highlight-selected');
-  lastSelected = target;
+          if (!window.parent.isSelectionModeActive) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const target = e.target;
+          if (lastSelected) lastSelected.classList.remove('highlight-selected');
+          target.classList.add('highlight-selected');
+          lastSelected = target;
 
-  const path = [];
-  let el = target;
-  while (el && el !== document.body && el.id !== 'base-layer') {
-    let selector = '';
-    if (el.id) {
-      selector = '#' + el.id;
-    } else if (el.className && typeof el.className === 'string') {
-      const classes = el.className.split(' ').filter(c => !c.includes('highlight'));
-      if (classes.length > 0) selector = '.' + classes.join('.');
-    }
-    if (selector) path.unshift(selector);
-    el = el.parentElement;
-  }
-  
-  // Format the selector: remove '>', and handle 'body'
-  let selectorString = path.length > 0 ? path.join(' ') : 'body';
-  if (selectorString === 'body') selectorString = 'html, body';
-  
-  window.parent.postMessage({ type: 'element-selected', selector: selectorString }, '*');
-});
+          const path = [];
+          let el = target;
+          while (el && el !== document.body && el.id !== 'base-layer') {
+            let selector = '';
+            if (el.id) {
+              selector = '#' + el.id;
+            } else if (el.className && typeof el.className === 'string') {
+              const classes = el.className.split(' ').filter(c => !c.includes('highlight'));
+              if (classes.length > 0) selector = '.' + classes.join('.');
+            }
+            if (selector) path.unshift(selector);
+            el = el.parentElement;
+          }
+          
+          let selectorString = path.length > 0 ? path.join(' ') : 'body';
+          if (selectorString === 'body') selectorString = 'html, body';
+          
+          window.parent.postMessage({ type: 'element-selected', selector: selectorString }, '*');
+        });
       </script>
     </body>
   </html>
@@ -96,10 +125,22 @@ export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
   }, [isSelectionMode])
 
   useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data.type === 'iframe-ready' && iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage({ type: 'update-css', css: cssCode }, '*')
+        iframeRef.current.contentWindow.postMessage({ type: 'update-avatar', avatarUrl: finalAvatarUrl }, '*')
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [cssCode, finalAvatarUrl])
+
+  useEffect(() => {
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage({ type: 'update-css', css: cssCode }, '*')
+      iframeRef.current.contentWindow.postMessage({ type: 'update-avatar', avatarUrl: finalAvatarUrl }, '*')
     }
-  }, [cssCode])
+  }, [cssCode, finalAvatarUrl, version])
 
   useEffect(() => {
     const updateScale = () => {
