@@ -28,58 +28,88 @@ export const studioTheme = createTheme({
 export const customSearchTheme = EditorView.theme({
   "&.cm-editor": { backgroundColor: "transparent" },
   ".cm-scroller": { backgroundColor: "transparent" },
-  ".cm-panel.cm-search": { 
-    backgroundColor: "var(--muted)", 
-    color: "var(--foreground)", 
-    borderBottom: "none", 
-    fontSize: "0.90rem", 
-    padding: ".70rem" 
+  ".cm-panel.cm-search": {
+    backgroundColor: "var(--muted)",
+    color: "var(--foreground)",
+    borderBottom: "none",
+    fontSize: "0.90rem",
+    padding: ".70rem"
   },
-  ".cm-search input": { 
-    backgroundColor: "transparent", 
-    color: "var(--foreground)", 
-    border: "1px solid var(--primary)", 
-    borderRadius: "var(--radius)", 
-    fontSize: "0.60rem" 
+  ".cm-search input": {
+    backgroundColor: "transparent",
+    color: "var(--foreground)",
+    border: "1px solid var(--primary)",
+    borderRadius: "var(--radius)",
+    fontSize: "0.60rem"
   },
-  ".cm-search .cm-button": { 
-    backgroundColor: "var(--primary)", 
-    backgroundImage: "none", 
-    color: "var(--primary-foreground)", 
-    fontSize: "0.60rem", 
-    border: "1px solid var(--primary)", 
-    borderRadius: "var(--radius)" 
+  ".cm-search .cm-button": {
+    backgroundColor: "var(--primary)",
+    backgroundImage: "none",
+    color: "var(--primary-foreground)",
+    fontSize: "0.60rem",
+    border: "1px solid var(--primary)",
+    borderRadius: "var(--radius)"
   },
-  ".cm-search .cm-button:hover": { 
-    backgroundColor: "var(--secondary)", 
-    color: "var(--secondary-foreground)" 
+  ".cm-search .cm-button:hover": {
+    backgroundColor: "var(--secondary)",
+    color: "var(--secondary-foreground)"
   },
-  ".cm-search button[name=close]": { 
-    color: "var(--primary)", 
-    background: "var(--primary)" 
+  ".cm-search button[name=close]": {
+    color: "var(--primary)",
+    background: "var(--primary)"
   },
-  ".cm-search input[type='checkbox']": { 
-    accentColor: "var(--chart-1)", 
-    cursor: "pointer", 
-    width: "0.60rem", 
-    height: "0.60rem" 
+  ".cm-search input[type='checkbox']": {
+    accentColor: "var(--chart-1)",
+    cursor: "pointer",
+    width: "0.60rem",
+    height: "0.60rem"
   },
-  "&.cm-focused .cm-completionIcon": { display: "none" },
-  ".cm-tooltip.cm-tooltip-autocomplete": { 
-    backgroundColor: "var(--background)", 
-    border: "1px solid var(--border)", 
-    borderRadius: "0.75rem", 
-    padding: "0.25rem", 
-    overflow: "hidden" 
+
+  ".cm-tooltip": {
+    position: "absolute",
+    zIndex: "100000 !important",
   },
-  ".cm-tooltip.cm-tooltip-autocomplete ul li": { 
-    borderRadius: "var(--radius)", 
-    padding: "0.25rem 0.5rem", 
-    color: "var(--secondary-foreground)" 
+  ".cm-tooltip.cm-tooltip-autocomplete": {
+    backgroundColor: "var(--background)",
+    border: "1px solid var(--border)",
+    borderRadius: "0.75rem",
+    padding: "0.25rem",
+    overflow: "hidden", // Hide browser default scrollbar
+    minWidth: "200px",
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
   },
-  ".cm-tooltip.cm-tooltip-autocomplete ul li[aria-selected]": { 
-    backgroundColor: "var(--secondary)", 
-    color: "var(--secondary-foreground)" 
+
+  // Shadcn-style ScrollArea implementation for the autocomplete list
+  ".cm-tooltip.cm-tooltip-autocomplete ul": {
+    maxHeight: "250px",
+    overflowY: "auto",
+    padding: "0",
+    margin: "0",
+    "&::-webkit-scrollbar": {
+      width: "6px",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "transparent",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: "var(--border)",
+      borderRadius: "9999px",
+      transition: "background 0.2s",
+    },
+    "&::-webkit-scrollbar-thumb:hover": {
+      background: "var(--muted-foreground)",
+    },
+  },
+
+  ".cm-tooltip.cm-tooltip-autocomplete ul li": {
+    borderRadius: "var(--radius)",
+    padding: "0.4rem 0.6rem",
+    color: "var(--secondary-foreground)",
+    cursor: "pointer",
+  },
+  ".cm-tooltip.cm-tooltip-autocomplete ul li[aria-selected]": {
+    backgroundColor: "var(--accent)",
+    color: "var(--accent-foreground)",
   },
   ".cm-foldPlaceholder": {
     backgroundColor: "transparent",

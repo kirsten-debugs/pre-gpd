@@ -16,6 +16,8 @@ type StudioContextType = {
   targetProperty: string
   setTargetProperty: (prop: string) => void
   updateElementStyle: (selector: string, property: string, value: string) => void
+  rootCss: string
+  setRootCss: (css: string) => void
 }
 
 type CssCodeContextType = {
@@ -29,6 +31,7 @@ const CssCodeContext = createContext<CssCodeContextType | undefined>(undefined)
 export function StudioProvider({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState<"v1" | "v2">("v2")
   const [cssCode, setCssCode] = useState("")
+  const [rootCss, setRootCss] = useState(":root {\n  --primary: #3b82f6;\n}")
   const [isCodeOpen, setIsCodeOpen] = useState(false)
   const [selectedElement, setSelectedElement] = useState<string | null>(null)
   const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -54,27 +57,25 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-const updateElementStyle = useCallback((selector: string, property: string, value: string) => {
-  setCssCode(prev => {
-    // Escape special characters for Regex, but keep the comma/space for 'html, body'
-    // We only need to escape characters that interfere with Regex structure
-    const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const selectorRegex = new RegExp(`${escapedSelector}\\s*{([^}]*)}`, 'g');
-    
-    let found = false;
-    const updatedCss = prev.replace(selectorRegex, (match, body) => {
-      found = true;
-      const propRegex = new RegExp(`${property}:\\s*[^;!]+(!important)?`, 'g');
-      const newProp = `${property}: ${value} !important`;
-      if (propRegex.test(body)) {
-        return match.replace(propRegex, newProp);
-      }
-      return match.replace('{', `{ ${newProp};`);
-    });
+  const updateElementStyle = useCallback((selector: string, property: string, value: string) => {
+    setCssCode(prev => {
+      const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const selectorRegex = new RegExp(`${escapedSelector}\\s*{([^}]*)}`, 'g');
+      
+      let found = false;
+      const updatedCss = prev.replace(selectorRegex, (match, body) => {
+        found = true;
+        const propRegex = new RegExp(`${property}:\\s*[^;!]+(!important)?`, 'g');
+        const newProp = `${property}: ${value} !important`;
+        if (propRegex.test(body)) {
+          return match.replace(propRegex, newProp);
+        }
+        return match.replace('{', `{ ${newProp};`);
+      });
 
-    return found ? updatedCss : `${prev}\n${selector} { ${property}: ${value} !important; }`;
-  });
-}, []);
+      return found ? updatedCss : `${prev}\n${selector} { ${property}: ${value} !important; }`;
+    });
+  }, []);
 
   const insertCode = useCallback((text: string) => {
     setIsCodeOpen(true)
@@ -97,8 +98,9 @@ const updateElementStyle = useCallback((selector: string, property: string, valu
   const studioValue = useMemo(() => ({ 
     version, setVersion, isCodeOpen, setIsCodeOpen, loadPreset, 
     editorViewRef, insertCode, selectedElement, setSelectedElement,
-    isSelectionMode, setIsSelectionMode, targetProperty, setTargetProperty, updateElementStyle
-  }), [version, isCodeOpen, loadPreset, insertCode, selectedElement, isSelectionMode, targetProperty, updateElementStyle])
+    isSelectionMode, setIsSelectionMode, targetProperty, setTargetProperty, updateElementStyle,
+    rootCss, setRootCss
+  }), [version, isCodeOpen, loadPreset, insertCode, selectedElement, isSelectionMode, targetProperty, updateElementStyle, rootCss])
   
   const cssValue = useMemo(() => ({ cssCode, setCssCode }), [cssCode])
 

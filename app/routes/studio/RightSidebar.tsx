@@ -110,7 +110,7 @@ export const RightSidebar = memo(function RightSidebar() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label className="text-[10px] text-muted-foreground flex items-center gap-1"><Type className="size-3" /> Font</label>
-                      <Select onValueChange={(v) => handleStyleChange("font-family", v)}>
+                      <Select onValueChange={(v: string | null | undefined) => v && handleStyleChange("font-family", v)}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Family" /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="sans-serif">Sans Serif</SelectItem>
@@ -122,14 +122,14 @@ export const RightSidebar = memo(function RightSidebar() {
 
                     <div className="space-y-1">
                       <label className="text-[10px] text-muted-foreground flex items-center gap-1"><Palette className="size-3" /> Color</label>
-                      <PopoverPicker color="#000000" onChange={(c) => handleStyleChange("color", c)} />
+                      <PopoverPicker color="#000000" onChange={(c: string) => handleStyleChange("color", c)} />
                     </div>
 
                     <div className="space-y-1">
                       <label className="text-[10px] text-muted-foreground flex items-center gap-1"><Eye className="size-3" /> Opacity</label>
                       <div className="relative flex items-center">
                         <div {...bindOpacity()} className="absolute left-2 z-10 text-[10px] text-muted-foreground font-bold uppercase cursor-ew-resize hover:text-foreground select-none touch-none">o</div>
-                        <Input type="number" value={opacity} onChange={(e) => { const v = Math.min(100, Math.max(0, Number(e.target.value))); setOpacity(v); handleStyleChange("opacity", v / 100) }} className="h-8 pl-6 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                        <Input type="number" value={opacity} onChange={(e) => { const v = Math.min(100, Math.max(0, Number(e.target.value))); setOpacity(v); handleStyleChange("opacity", v / 100) }} className="h-8 pl-6 text-xs" />
                       </div>
                     </div>
 
@@ -137,7 +137,7 @@ export const RightSidebar = memo(function RightSidebar() {
                       <label className="text-[10px] text-muted-foreground flex items-center gap-1"><Layers3 className="size-3" /> Z-Index</label>
                       <div className="relative flex items-center">
                         <div {...bindZIndex()} className="absolute left-2 z-10 text-[10px] text-muted-foreground font-bold uppercase cursor-ew-resize hover:text-foreground select-none touch-none">z</div>
-                        <Input type="number" value={zIndex} onChange={(e) => { const v = Math.max(0, Number(e.target.value)); setZIndex(v); handleStyleChange("z-index", v) }} className="h-8 pl-6 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                        <Input type="number" value={zIndex} onChange={(e) => { const v = Math.max(0, Number(e.target.value)); setZIndex(v); handleStyleChange("z-index", v) }} className="h-8 pl-6 text-xs" />
                       </div>
                     </div>
                   </div>
@@ -158,8 +158,8 @@ export const RightSidebar = memo(function RightSidebar() {
                         const val = Math.min(100, Math.max(0, Number(e.target.value)))
                         setBorderRadius(val)
                         handleStyleChange("border-radius", `${val}%`)
-                      }}
-                      className="h-8 pl-6 text-xs rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      }} 
+                      className="h-8 pl-6 text-xs rounded-md"
                     />
                     <span className="absolute right-3 text-xs text-muted-foreground pointer-events-none">%</span>
                   </div>

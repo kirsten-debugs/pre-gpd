@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { LocalProfile } from "@/components/LocalProfile"
-import { StudioContent } from "@/components/StudioContent"
+import { StudioContent } from "~/routes/studio/StudioContent"
 import { StudioProvider } from "./studio/StudioContext"
 import { Monitor } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-is-mobile"

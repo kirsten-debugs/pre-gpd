@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useMemo, lazy, Suspense } from "react"
 import { useLocation } from "react-router"
 import { motion, AnimatePresence } from "motion/react"

@@ -16,11 +16,14 @@ interface CanvasProps {
 }
 
 export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
-  const { version, isSelectionMode } = useStudio()
+  const { version, isSelectionMode, rootCss } = useStudio()
   const { cssCode } = useCssCode()
   const { avatarUrl } = useProfileStore()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  // Combined CSS logic
+  const combinedCss = useMemo(() => `${rootCss}\n${cssCode}`, [rootCss, cssCode])
 
   const htmlSource = useMemo(() => (version === "v1" ? gaiaV1Html : gaiaHtml), [version])
   const baseCss = useMemo(() => (version === "v1" ? gaiaV1Css : gaiaCss), [version])
@@ -127,20 +130,20 @@ export const Canvas = memo(function Canvas({ isMaximized }: CanvasProps) {
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
       if (e.data.type === 'iframe-ready' && iframeRef.current?.contentWindow) {
-        iframeRef.current.contentWindow.postMessage({ type: 'update-css', css: cssCode }, '*')
+        iframeRef.current.contentWindow.postMessage({ type: 'update-css', css: combinedCss }, '*')
         iframeRef.current.contentWindow.postMessage({ type: 'update-avatar', avatarUrl: finalAvatarUrl }, '*')
       }
     }
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [cssCode, finalAvatarUrl])
+  }, [combinedCss, finalAvatarUrl])
 
   useEffect(() => {
     if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({ type: 'update-css', css: cssCode }, '*')
+      iframeRef.current.contentWindow.postMessage({ type: 'update-css', css: combinedCss }, '*')
       iframeRef.current.contentWindow.postMessage({ type: 'update-avatar', avatarUrl: finalAvatarUrl }, '*')
     }
-  }, [cssCode, finalAvatarUrl, version])
+  }, [combinedCss, finalAvatarUrl, version])
 
   useEffect(() => {
     const updateScale = () => {

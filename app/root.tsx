@@ -13,7 +13,6 @@ import { ThemeProvider } from 'next-themes'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MainLayout } from '@/layouts/MainLayout'
 import { Toaster } from "@/components/ui/sonner"
-import "./themes/index.css"
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

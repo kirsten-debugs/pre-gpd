@@ -1,3 +1,5 @@
+import { memo } from "react"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,43 +17,61 @@ interface UserAvatarProps {
   onOpenProfile: () => void
 }
 
-export function UserAvatar({ onOpenProfile }: UserAvatarProps) {
-  const { username, userId, avatarUrl } = useProfileStore()
+export const UserAvatar = memo(function UserAvatar({
+  onOpenProfile,
+}: UserAvatarProps) {
+  const username = useProfileStore((state) => state.username)
+  const userId = useProfileStore((state) => state.userId)
+  const avatarUrl = useProfileStore((state) => state.avatarUrl)
+
+  const displayName = username || "Guest"
+  const displayId = userId || "No ID"
+  const initial = username?.[0]?.toUpperCase() || "U"
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button variant="ghost" size="icon" className="rounded-full size-8">
-          <Avatar className="size-8 overflow-hidden relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 rounded-full"
+          aria-label="User menu"
+        >
+          <Avatar className="relative size-8 overflow-hidden">
             {avatarUrl ? (
-              <AvatarImage 
-                src={avatarUrl} 
-                alt={username || "User"} 
-                className="w-20 h-27.5 max-w-none -mt-6 -ml-4.5"
+              <AvatarImage
+                src={avatarUrl}
+                alt={displayName}
+                loading="lazy"
+                className="h-[110px] w-20 max-w-none -ml-[18px] -mt-6"
               />
             ) : (
-              <AvatarFallback>{username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+              <AvatarFallback>{initial}</AvatarFallback>
             )}
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
+
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex flex-col">
-            <span className="text-sm font-medium">{username || "Guest"}</span>
-            <span className="text-xs text-muted-foreground font-normal">{userId || "No ID"}</span>
+            <span className="text-sm font-medium">{displayName}</span>
+            <span className="text-xs font-normal text-muted-foreground">
+              {displayId}
+            </span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={onOpenProfile}>
             {username ? "Edit Local Profile" : "Setup Local Profile"}
           </DropdownMenuItem>
+
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

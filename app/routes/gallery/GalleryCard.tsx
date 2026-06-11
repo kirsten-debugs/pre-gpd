@@ -13,14 +13,16 @@ export const PresetCard = memo(function PresetCard({ preset }: { preset: any }) 
         : `/presets/${preset.category}/${preset.id}/${preset.meta.thumbnail}`
 
     return (
-        <Card className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card p-2 transition-all duration-500 ease-out hover:border-primary/50">
+        <Card className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card p-2 transition-all duration-500 ease-out hover:border-primary/50" style={{ contentVisibility: 'auto', containIntrinsicSize: '200px 300px' }}>
             <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-secondary">
                 {preset.meta.thumbnail && !imageError ? (
                     <img
                         src={imageSrc}
                         alt={preset.meta.title}
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" // Reduced duration for snappier feel
                         loading="lazy"
+                        width={400} // Add intrinsic dimensions to prevent layout shift
+                        height={225}
                         onError={() => setImageError(true)}
                     />
                 ) : (

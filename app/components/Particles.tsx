@@ -31,7 +31,7 @@ interface Circle {
 export function Particles({
   className,
   children,
-  quantity = 50,
+  quantity = 20,
   staticity = 50,
   ease = 50,
   size = 0.4,
