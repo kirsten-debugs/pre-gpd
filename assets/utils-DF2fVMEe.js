@@ -1,0 +1,1 @@
+import{dt as e,ft as t}from"./entry.client-BRN9rreO.js";function n(...n){return e(t(n))}export{n as t};
