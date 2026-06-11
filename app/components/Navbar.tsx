@@ -7,9 +7,9 @@ import { ThemeSwatches } from "~/components/ThemeSwatches"
 import { Particles } from "~/components/Particles"
 
 const NAV_LINKS = [
-  { name: "Home", to: "/" }, // React Router knows to prepend /gaia-profile-design/
-  { name: "Gallery", to: "gallery" }, // Change to relative path
-  { name: "Creators", to: "creators" }, // Change to relative path
+  { name: "Home", to: "" },
+  { name: "Gallery", to: "gallery" },
+  { name: "Creators", to: "creators" },
 ] as const
 
 const NavLink = memo(({ to, name, mobile, onClick }: { to: string; name: string; mobile?: boolean; onClick?: () => void }) => (
@@ -71,7 +71,7 @@ export default function Navbar() {
 
   useEffect(() => { setIsOpen(false) }, [location.pathname])
 
-  if (location.pathname === "/studio") return null
+  if (location.pathname.endsWith("/studio")) return null
 
   return (
     <>
@@ -80,7 +80,7 @@ export default function Navbar() {
         <Particles className="absolute inset-0 z-[-1]" quantity={30} />
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex h-20 items-center justify-between">
-            <Link to="/" className="group flex shrink-0 items-center gap-2.5 outline-hidden">
+            <Link to="" className="group flex shrink-0 items-center gap-2.5 outline-hidden">
               <div className="bg-surface relative flex h-10 w-10 items-center justify-center rounded-xl border border-border transition-all group-hover:border-primary"><Sparkles size={20} className="text-primary" /></div>
               <div className="flex flex-col"><span className="text-sm font-bold uppercase">Gaia</span><span className="text-[9px] font-black text-primary uppercase">Profile Design</span></div>
             </Link>
@@ -95,7 +95,7 @@ export default function Navbar() {
               <ThemeSwatches />
               <div className="relative overflow-hidden rounded-2xl p-0.5">
                 <div className="absolute inset-0 animate-conic-rotate" style={{ background: "conic-gradient(var(--chart-1), var(--chart-3), var(--chart-5), var(--chart-1))" }} />
-                <Link to="/studio" className="relative z-10 flex items-center justify-center px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-2xl bg-background text-foreground transition-all hover:bg-background/90 outline-hidden">Studio</Link>
+                <Link to="studio" className="relative z-10 flex items-center justify-center px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-2xl bg-background text-foreground transition-all hover:bg-background/90 outline-hidden">Studio</Link>
               </div>
               <button onClick={() => setIsOpen(!isOpen)} className="bg-surface rounded-xl border border-border p-2.5 lg:hidden focus-visible:ring-2 focus-visible:ring-primary" aria-expanded={isOpen}>
                 {isOpen ? <X size={20} /> : <Menu size={20} />}
