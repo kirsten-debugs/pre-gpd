@@ -1,0 +1,1 @@
+import{dt as e,ft as t}from"./entry.client-DhYYPFTi.js";function n(...n){return e(t(n))}export{n as t};

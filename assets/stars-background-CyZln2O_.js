@@ -1,0 +1,13 @@
+var e=`html, body {
+    background: url(https://i.ibb.co/kxG8j51/Firefly-100s-1084px.png) repeat center;
+    animation: 20s stars linear infinite;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: visible;
+}
+
+@keyframes stars {
+    100% {
+        background-position: 0px 500px;
+    }
+}`;export{e as default};
