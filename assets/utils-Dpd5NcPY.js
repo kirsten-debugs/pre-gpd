@@ -1,0 +1,1 @@
+import{dt as e,ft as t}from"./entry.client-QwaFd4aJ.js";function n(...n){return e(t(n))}export{n as t};
