@@ -7,9 +7,9 @@ import { ThemeSwatches } from "~/components/ThemeSwatches"
 import { Particles } from "~/components/Particles"
 
 const NAV_LINKS = [
-  { name: "Home", to: "/" },
-  { name: "Gallery", to: "/gallery" },
-  { name: "Creators", to: "/creators" },
+  { name: "Home", to: "/" }, // React Router knows to prepend /gaia-profile-design/
+  { name: "Gallery", to: "gallery" }, // Change to relative path
+  { name: "Creators", to: "creators" }, // Change to relative path
 ] as const
 
 const NavLink = memo(({ to, name, mobile, onClick }: { to: string; name: string; mobile?: boolean; onClick?: () => void }) => (
