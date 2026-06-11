@@ -7,9 +7,9 @@ import { ThemeSwatches } from "~/components/ThemeSwatches"
 import { Particles } from "~/components/Particles"
 
 const NAV_LINKS = [
-  { name: "Home", to: "" },
-  { name: "Gallery", to: "gallery" },
-  { name: "Creators", to: "creators" },
+  { name: "Home", to: "/pre-gpd" },
+  { name: "Gallery", to: "/pre-gpd/gallery" },
+  { name: "Creators", to: "/pre-gpd/gallery" },
 ] as const
 
 const NavLink = memo(({ to, name, mobile, onClick }: { to: string; name: string; mobile?: boolean; onClick?: () => void }) => (
