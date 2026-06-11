@@ -5,7 +5,7 @@ import { defineConfig } from "vite"
 export default defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [tailwindcss(), reactRouter()],
-  base: '/pre-gpd/',
+  base: './',
   build: {
     assetsInlineLimit: 0,
     rollupOptions: {
