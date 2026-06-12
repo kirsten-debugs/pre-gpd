@@ -1,1 +1,0 @@
-import{Ct as e,Lt as t,wt as n}from"./vendor-core-B1JjQf0H.js";var r=t(),i=e(),a=sessionStorage.redirect;if(a){delete sessionStorage.redirect;let e=new URL(a,window.location.origin),t=e.pathname.replace(`/pre-gpd`,``)+e.search+e.hash;window.history.replaceState(null,``,t)}(0,r.hydrateRoot)(document.getElementById(`root`),(0,i.jsx)(n,{}));
