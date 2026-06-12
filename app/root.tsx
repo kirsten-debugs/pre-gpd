@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import {
   Links,
   Meta,
@@ -6,7 +5,6 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
-  useNavigate,
 } from "react-router"
 
 import type { Route } from "./+types/root"
@@ -45,19 +43,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const redirect = sessionStorage.redirect
-    if (redirect) {
-      delete sessionStorage.redirect
-      // Extract the path after the base /pre-gpd/
-      const url = new URL(redirect)
-      const path = url.pathname.replace("/pre-gpd", "")
-      navigate(path || "/")
-    }
-  }, [navigate])
-
   return <Outlet />
 }
 
