@@ -1,0 +1,1 @@
+import{dt as e,ft as t}from"./vendor-core-B1JjQf0H.js";function n(...n){return e(t(n))}export{n as t};
