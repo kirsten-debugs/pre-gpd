@@ -1,4 +1,4 @@
-import{a as e}from"./rolldown-runtime-Cyuzqnbw.js";import{Ct as t,Nt as n,Rt as r,V as i,at as a,bt as o,it as s,ot as c,rt as l,wt as u}from"./entry.client-DhYYPFTi.js";import{t as d}from"./utils-D9d9ebkd.js";import{n as f,r as p}from"./vendor-motion-CI0-3EKx.js";import{F as m,I as h,L as g,c as _,i as v}from"./vendor-icons-r8xMIY1o.js";import{t as y}from"./button-Br0Z3eng.js";import{a as b,i as x,n as S,r as C,s as w,t as T}from"./select-CfoHugN9.js";import{t as E}from"./use-is-mobile-CRUdNZPj.js";var D=e(r(),1),O=`title = "Botanica"\r
+import{a as e}from"./rolldown-runtime-Cyuzqnbw.js";import{Ct as t,Nt as n,Rt as r,V as i,at as a,bt as o,it as s,ot as c,rt as l,wt as u}from"./entry.client-BRN9rreO.js";import{t as d}from"./utils-DF2fVMEe.js";import{n as f,r as p}from"./vendor-motion-BmzKCacB.js";import{F as m,I as h,L as g,c as _,i as v}from"./vendor-icons-GZ1P6pS4.js";import{t as y}from"./button-zNwHQMqI.js";import{a as b,i as x,n as S,r as C,s as w,t as T}from"./select-DSH136m7.js";import{t as E}from"./use-is-mobile-D6-J-ed-.js";var D=e(r(),1),O=`title = "Botanica"\r
 thumbnail = "https://rstr.in/1jo6mv5p8ea7ef/gaia/rvLQA5i7m3H"\r
 \r
 [author]\r
